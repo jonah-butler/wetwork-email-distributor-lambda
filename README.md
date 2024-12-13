@@ -1,0 +1,1 @@
+A simple email lambda that directs emails to the Wetwork primary content email.
