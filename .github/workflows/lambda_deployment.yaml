@@ -1,0 +1,42 @@
+name: Deploy Lambda Function
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up AWS credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1  # Replace with your Lambda's region
+
+      # Step 3: Install dependencies
+      - name: Install Dependencies
+        run: |
+          cd $GITHUB_WORKSPACE
+          npm install
+
+      # Step 4: Zip Lambda Function
+      - name: Zip Lambda Function
+        run: |
+          cd $GITHUB_WORKSPACE  # Ensure we are in the project root
+          zip -r lambda.zip app.mjs response node_modules package.json -x "*.github/*"
+
+      # Step 5: Deploy to AWS Lambda
+      - name: Update Lambda Function
+        run: |
+          aws lambda update-function-code \
+            --function-name wetwork-email-distributor\
+            --zip-file fileb://lambda.zip
