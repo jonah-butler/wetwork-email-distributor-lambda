@@ -6,7 +6,11 @@ const RECIPIENT = "jonahbutler6@gmail.com";
 
 export const handler = async (event) => {
 
+  console.log("hit function handler");
+
   const body = JSON.parse(event.body);
+
+  console.log("the body", body);
 
   const response = validatePostBody(body);
 
