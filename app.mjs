@@ -1,16 +1,13 @@
-// import AWS from 'aws-sdk';
-// const ses = new AWS.SES({ region: 'us-east-1' });
-import { validatePostBody, errorResponse } from "./response/response.mjs";
+import AWS from 'aws-sdk';
+const ses = new AWS.SES({ region: 'us-east-1' });
+import { validatePostBody, errorResponse, generateEmail } from "./response/response.mjs";
 
-const RECIPIENT = "jonahbutler6@gmail.com";
+const SENDER = "no-reply@wetwork.music";
+const RECIPIENT = "wetworkva@gmail.com";
 
 export const handler = async (event) => {
 
-  console.log("hit function handler");
-
   const body = JSON.parse(event.body);
-
-  console.log("the body", body);
 
   const response = validatePostBody(body);
 
@@ -19,10 +16,10 @@ export const handler = async (event) => {
     return errorResponse(422, message);
   }
 
-  const {subject, message} = body;
+  const {subject, message, from, returnAddress} = body;
 
   const params = {
-    Source: RECIPIENT,
+    Source: SENDER,
     Destination: {
       ToAddresses: [RECIPIENT],
     },
@@ -31,24 +28,24 @@ export const handler = async (event) => {
         Data: subject,
       },
       Body: {
-        Text: {
-          Data: message,
+        Html: {
+          Data: generateEmail(from, returnAddress, message),
         }
       },
     },
+    ReplyToAddresses: [returnAddress],
   };
 
-  // try {
-  //   const result = await ses.sendEmail(params).promise();
-  //   console.log("result", result);
-  // } catch(error) {
-  //   console.log("got an error", error);
-  // }
+  try {
+    await ses.sendEmail(params).promise();
+  } catch(error) {
+    return errorResponse(400, "Failed to send email: " + error.message);
+  }
 
   return {
       statusCode: 200,
       headers: {
-        'Content-Type': 'application/json', // Define the Content-Type
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
           success: "true",
