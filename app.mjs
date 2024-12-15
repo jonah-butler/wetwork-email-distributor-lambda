@@ -2,10 +2,14 @@ import AWS from 'aws-sdk';
 const ses = new AWS.SES({ region: 'us-east-1' });
 import { validatePostBody, errorResponse, generateEmail } from "./response/response.mjs";
 
-const SENDER = "no-reply@wetwork.music";
-const RECIPIENT = "wetworkva@gmail.com";
-
 export const handler = async (event) => {
+
+  const SENDER = process.env.SENDER;
+  const RECIPIENT = process.env.SENDER;
+
+  if(!SENDER || !RECIPIENT) {
+    return errorResponse(400, "Environment incomplete");
+  }
 
   const body = JSON.parse(event.body);
 

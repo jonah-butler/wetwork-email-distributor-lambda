@@ -10,6 +10,10 @@ Resources:
       Policies:
         - SESFullAccess
       CodeUri: .
+      Environment:
+        Variables:
+          SENDER: "no-reply@wetwork.music"
+          RECIPIENT: "wetworkva@gmail.com"
       Events:
         HelloWorldApi:
           Type: Api
