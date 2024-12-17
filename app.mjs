@@ -5,7 +5,7 @@ import { validatePostBody, errorResponse, generateEmail } from "./response/respo
 export const handler = async (event) => {
 
   const SENDER = process.env.SENDER;
-  const RECIPIENT = process.env.SENDER;
+  const RECIPIENT = process.env.RECIPIENT;
 
   if(!SENDER || !RECIPIENT) {
     return errorResponse(400, "Environment incomplete");
