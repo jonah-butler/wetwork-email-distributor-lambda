@@ -43,6 +43,7 @@ export const handler = async (event) => {
   try {
     await ses.sendEmail(params).promise();
   } catch(error) {
+    console.log("error: ", error);
     return errorResponse(400, "Failed to send email: " + error.message);
   }
 
